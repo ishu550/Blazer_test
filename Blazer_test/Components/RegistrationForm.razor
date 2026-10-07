@@ -1,0 +1,48 @@
+@using Blazer_test.Models
+@using Blazer_test.Services
+@inject UserSessionService Session
+@inject NavigationManager Nav
+
+<EditForm Model="registerModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Username</label>
+        <InputText class="form-control" @bind-Value="registerModel.Username" />
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="registerModel.Email" />
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <InputText class="form-control" @bind-Value="registerModel.Password" type="password" />
+    </div>
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Register & Sign in</button>
+    </div>
+</EditForm>
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@code {
+    private UserModel registerModel = new();
+    private string? successMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        // In a real app: validate uniqueness, hash password, persist to a database.
+        registerModel.RegisteredAt = DateTime.UtcNow;
+        await Session.SignInAsync(registerModel);
+        successMessage = $"Welcome, {registerModel.Username}!";
+        // Optionally navigate or close form
+        // Nav.NavigateTo("/dashboard");
+    }
+}

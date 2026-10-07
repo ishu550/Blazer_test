@@ -1,10 +1,15 @@
 using Blazer_test.Components;
+using Blazer_test.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Application services
+builder.Services.AddScoped<UserSessionService>();      // per-user session state (scoped)
+builder.Services.AddSingleton<AttendanceService>();    // global in-memory attendance store
 
 var app = builder.Build();
 

@@ -1,0 +1,95 @@
+@using Blazer_test.Services
+@using Blazer_test.Models
+@inject AttendanceService Attendance
+@inject UserSessionService Session
+
+@typeparam TEventId
+
+<div class="attendance-tracker">
+    @if (!Session.IsAuthenticated)
+    {
+        <div>
+            <p>You must register/sign-in to track attendance.</p>
+            @if (showInlineRegister)
+            {
+                <RegistrationForm />
+            }
+            else
+            {
+                <button class="btn btn-secondary" @onclick="()=> showInlineRegister = true">Register / Sign in</button>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="attendance-controls">
+            <button class="btn @(isAttending ? "btn-danger" : "btn-success")" @onclick="ToggleAsync">
+                @(isAttending ? "Cancel Attendance" : "Mark Attendance")
+            </button>
+            <span class="ml-2">Attendees: @attendanceCount</span>
+        </div>
+
+        @if (showAttendees)
+        {
+            <div class="attendee-list">
+                <h5>Attendees</h5>
+                <ul>
+                    @foreach (var a in attendees)
+                    {
+                        <li>@a</li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string EventId { get; set; } = "default-event";
+
+    private bool isAttending;
+    private int attendanceCount;
+    private IEnumerable<string> attendees = Enumerable.Empty<string>();
+    private bool showInlineRegister;
+    private bool showAttendees = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Attendance.OnChange += StateHasChanged;
+        Session.OnChange += StateHasChanged;
+        await RefreshAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Attendance.OnChange -= StateHasChanged;
+        Session.OnChange -= StateHasChanged;
+    }
+
+    private async Task RefreshAsync()
+    {
+        attendanceCount = await Attendance.GetAttendanceCountAsync(EventId);
+        attendees = await Attendance.GetAttendeesAsync(EventId);
+        if (Session.IsAuthenticated)
+        {
+            isAttending = await Attendance.IsAttendingAsync(EventId, Session.CurrentUser!.Username);
+        }
+        else
+        {
+            isAttending = false;
+        }
+    }
+
+    private async Task ToggleAsync()
+    {
+        if (!Session.IsAuthenticated || Session.CurrentUser == null)
+        {
+            showInlineRegister = true;
+            return;
+        }
+
+        await Attendance.ToggleAttendanceAsync(EventId, Session.CurrentUser.Username);
+        await RefreshAsync();
+    }
+}

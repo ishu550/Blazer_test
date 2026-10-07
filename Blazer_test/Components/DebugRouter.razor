@@ -1,0 +1,69 @@
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+
+<div class="debug-router-root">
+    <Router AppAssembly="@typeof(Program).Assembly" OnNavigateAsync="OnNavigateAsync">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" />
+            <div class="debug-inline">
+                <strong>Route Debug</strong>
+                <div><em>Page:</em> @routeData.PageType.FullName</div>
+                <div><em>Route values:</em>
+                    <pre class="route-values">@JsonSerializer.Serialize(routeData.RouteValues, new JsonSerializerOptions { WriteIndented = true })</pre>
+                </div>
+            </div>
+        </Found>
+        <NotFound>
+            <LayoutView>
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+            <div class="debug-inline">
+                <strong>Route Debug</strong>
+                <div>No page matched the current route.</div>
+            </div>
+        </NotFound>
+    </Router>
+
+    <button class="debug-toggle" @onclick="TogglePanel">@((ShowPanel) ? "Hide" : "Show") Route Debug</button>
+
+    @if (ShowPanel)
+    {
+        <aside class="debug-panel">
+            <h4>Routing Debug</h4>
+            <div><strong>Last URI:</strong> @LastUri</div>
+            <div><strong>Path:</strong> @LastPath</div>
+            <div><strong>Query:</strong> @LastQuery</div>
+            <div><strong>Timestamp:</strong> @LastTimestamp</div>
+            <div><strong>IsNavigating:</strong> @IsNavigating</div>
+        </aside>
+    }
+</div>
+
+@code {
+    private bool ShowPanel { get; set; } = false;
+    private string LastUri { get; set; } = string.Empty;
+    private string LastPath { get; set; } = string.Empty;
+    private string LastQuery { get; set; } = string.Empty;
+    private DateTime LastTimestamp { get; set; } = DateTime.MinValue;
+    private bool IsNavigating { get; set; }
+
+    private void TogglePanel()
+    {
+        ShowPanel = !ShowPanel;
+    }
+
+    private Task OnNavigateAsync(NavigationContext args)
+    {
+        // capture navigation details for debugging
+        IsNavigating = true;
+        LastPath = args.Path ?? string.Empty;
+        LastQuery = args.QueryString ?? string.Empty;
+        LastUri = NavigationManager.Uri;
+        LastTimestamp = DateTime.UtcNow;
+
+        // small yield to allow Router to complete; remove or extend if you need to block navigation
+        IsNavigating = false;
+        return Task.CompletedTask;
+    }
+}

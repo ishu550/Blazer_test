@@ -1,0 +1,29 @@
+@page "/foundation-events"
+@using Blazer_test.Models
+@using Blazer_test.Components
+
+<h3>Foundation Event (two-way binding demo)</h3>
+
+<FoundationEventCard @bind-Event="SelectedEvent" />
+
+<hr />
+
+<h4>Preview</h4>
+<div>
+  <strong>@SelectedEvent.Title</strong><br />
+  @SelectedEvent.Date.ToShortDateString() — @SelectedEvent.Location<br />
+  Virtual: @(SelectedEvent.IsVirtual ? "Yes" : "No") — Attendees: @SelectedEvent.Attendees
+  <p>@SelectedEvent.Description</p>
+</div>
+
+@code {
+    private EventModel SelectedEvent { get; set; } = new EventModel
+    {
+        Title = "Community Fundraiser",
+        Date = DateTime.Today.AddDays(14),
+        Location = "Town Hall",
+        Description = "An event to support local foundations.",
+        IsVirtual = false,
+        Attendees = 25
+    };
+}

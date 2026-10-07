@@ -1,0 +1,21 @@
+.foundation-event-card {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 420px;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.foundation-event-card label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.foundation-event-card .actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,51 @@
+.debug-router-root {
+  position: relative;
+}
+
+/* Inline debug area shown under each rendered page */
+.debug-inline {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.debug-inline .route-values {
+  background: #f7f7f7;
+  padding: 0.5rem;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 180px;
+}
+
+/* Floating panel */
+.debug-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  width: 320px;
+  max-height: 60vh;
+  overflow: auto;
+  background: rgba(255,255,255,0.98);
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  z-index: 1200;
+}
+
+/* Toggle button */
+.debug-toggle {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  transform: translateY(-100%);
+  z-index: 1300;
+  background: #0078d4;
+  color: white;
+  border: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}

@@ -1,0 +1,89 @@
+@using Blazer_test.Models
+
+<div class="foundation-event-card">
+  <label>Title
+    <input @bind="EditableEvent.Title" @bind:event="oninput" @oninput="NotifyChanged" />
+  </label>
+
+  <label>Date
+    <input type="date" value="@DateString" @onchange="OnDateChanged" />
+  </label>
+
+  <label>Location
+    <input @bind="EditableEvent.Location" @bind:event="oninput" @oninput="NotifyChanged" />
+  </label>
+
+  <label>Description
+    <textarea @bind="EditableEvent.Description" @bind:event="oninput" @oninput="NotifyChanged"></textarea>
+  </label>
+
+  <label>
+    <input type="checkbox" @bind="EditableEvent.IsVirtual" @onchange="NotifyChanged" />
+    Virtual
+  </label>
+
+  <label>Attendees
+    <input type="number" min="0" @bind="EditableEvent.Attendees" @bind:event="oninput" @oninput="NotifyChanged" />
+  </label>
+
+  <div class="actions">
+    <button type="button" @onclick="Save">Save</button>
+  </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventModel Event { get; set; } = new EventModel();
+
+    [Parameter]
+    public EventCallback<EventModel> EventChanged { get; set; }
+
+    // Local editable copy to allow controlled updates to parent via EventChanged
+    private EventModel EditableEvent { get; set; } = new EventModel();
+
+    protected override void OnParametersSet()
+    {
+        // Create a shallow copy to edit locally
+        EditableEvent = new EventModel
+        {
+            Title = Event.Title,
+            Date = Event.Date,
+            Location = Event.Location,
+            Description = Event.Description,
+            IsVirtual = Event.IsVirtual,
+            Attendees = Event.Attendees
+        };
+    }
+
+    private string DateString
+    {
+        get => EditableEvent.Date.ToString("yyyy-MM-dd");
+    }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e?.Value?.ToString(), out var d))
+        {
+            EditableEvent.Date = d;
+            await NotifyChanged();
+        }
+    }
+
+    private async Task NotifyChanged()
+    {
+        // copy back to the bound Event instance and notify parent
+        Event.Title = EditableEvent.Title;
+        Event.Date = EditableEvent.Date;
+        Event.Location = EditableEvent.Location;
+        Event.Description = EditableEvent.Description;
+        Event.IsVirtual = EditableEvent.IsVirtual;
+        Event.Attendees = EditableEvent.Attendees;
+
+        await EventChanged.InvokeAsync(Event);
+    }
+
+    private async Task Save()
+    {
+        await NotifyChanged();
+    }
+}

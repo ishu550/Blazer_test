@@ -1,0 +1,28 @@
+@page "/dashboard"
+@using Blazer_test.Models
+@using Blazer_test.Services
+@inject UserSessionService Session
+
+<h3>Dashboard — Registration & Attendance demo</h3>
+
+@if (!Session.IsAuthenticated)
+{
+    <p>Not signed in. Use the registration form to sign in for demo purposes.</p>
+    <RegistrationForm />
+}
+else
+{
+    <p>Signed in as <strong>@Session.CurrentUser!.Username</strong> (@Session.CurrentUser!.Email)</p>
+    <button class="btn btn-link" @onclick="SignOut">Sign out</button>
+}
+
+<hr />
+
+<h4>Sample Event: "Foundation Meetup"</h4>
+<p>Date: @DateTime.Today.AddDays(7).ToShortDateString()</p>
+
+<AttendanceTracker EventId="foundation-meetup-001" />
+
+@code {
+    private Task SignOut() => Session.SignOutAsync();
+}
